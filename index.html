@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>내집이었다면 — 그때 샀으면 인생이 달라졌을 텐데</title>
+<meta property="og:title" content="내집이었다면 — 그때 샀으면">
+<meta property="og:description" content="그때 샀으면 지금쯤 얼마였을까. 서울 부동산 후회 계산기">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;700;900&family=DM+Mono:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080a0e;
+    --bg2:       #0d1017;
+    --bg3:       #111520;
+    --surface:   #141820;
+    --border:    #1e2430;
+    --border2:   #252c3a;
+    --red:       #c0392b;
+    --red-dim:   #8b1a12;
+    --red-glow:  rgba(192,57,43,0.18);
+    --red-faint: rgba(192,57,43,0.06);
+    --text:      #e8eaf0;
+    --text2:     #8a90a0;
+    --text3:     #4a5060;
+    --mono:      'DM Mono', monospace;
+    --sans:      'Noto Sans KR', sans-serif;
+    --display:   'Bebas Neue', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 9999;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 900px; height: 500px;
+    background: radial-gradient(ellipse, rgba(192,57,43,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    padding: 72px 0 48px;
+    text-align: center;
+    z-index: 1;
+  }
+  .site-eyebrow {
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0.35em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.1s forwards;
+  }
+  .site-title {
+    font-family: var(--display);
+    font-size: clamp(80px, 14vw, 150px);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    margin-bottom: 4px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.25s forwards;
+  }
+  .site-title span { color: var(--red); display: inline-block; }
+  .site-sub {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    margin-top: 14px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.4s forwards;
+  }
+  .divider-line {
+    width: 1px; height: 48px;
+    background: linear-gradient(to bottom, var(--red), transparent);
+    margin: 32px auto 0;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.55s forwards;
+  }
+
+  /* LAYOUT */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+  .step-label {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.4em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .step-label::after {
+    content: ''; flex: 1;
+    height: 1px; background: var(--border);
+  }
+
+  /* REGION TABS */
+  .region-tabs {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 2px;
+  }
+  .region-tabs::-webkit-scrollbar { display: none; }
+  .region-tab {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-right: none;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+  .region-tab:first-child { border-radius: 4px 0 0 0; }
+  .region-tab:last-child  { border-right: 1px solid var(--border); border-radius: 0 4px 0 0; }
+  .region-tab:hover { color: var(--text2); background: var(--surface); }
+  .region-tab.active {
+    background: var(--surface);
+    color: var(--text);
+    border-bottom-color: var(--surface);
+    position: relative; z-index: 1;
+  }
+  .region-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 1px; background: var(--surface);
+  }
+
+  /* APT GRID */
+  .apt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 2px;
+  }
+  .apt-item {
+    background: var(--bg3);
+    border: 1px solid transparent;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+  }
+  .apt-item:hover { border-color: var(--border2); background: var(--surface); }
+  .apt-item.selected {
+    border-color: var(--red-dim);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--red-dim);
+  }
+  .apt-name {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 5px;
+  }
+  .apt-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .apt-district {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+  }
+  .apt-area-badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text3);
+    background: var(--border);
+    padding: 2px 5px;
+    border-radius: 2px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+  .apt-item.selected .apt-district { color: var(--red); }
+  .apt-item.selected .apt-area-badge { background: var(--red-dim); color: var(--text2); }
+
+  /* SELECTED PREVIEW */
+  .selected-preview {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: none;
+    margin-bottom: 2px;
+  }
+  .selected-preview.show { display: flex; }
+  .preview-dot {
+    width: 5px; height: 5px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--red);
+    flex-shrink: 0;
+  }
+  .preview-name { font-size: 12px; font-weight: 400; color: var(--text); }
+  .preview-addr { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-left: auto; }
+  .preview-area { font-family: var(--mono); font-size: 10px; color: var(--text2); background: var(--border); padding: 2px 7px; border-radius: 2px; }
+
+  /* INPUTS */
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+  .input-group {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 20px 20px 16px;
+    transition: border-color 0.2s;
+  }
+  .input-group:focus-within { border-color: var(--border2); }
+  .input-group:first-child { border-radius: 4px 0 0 4px; }
+  .input-group:last-child  { border-radius: 0 4px 4px 0; }
+  .input-label {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--text3);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 10px;
+  }
+  input[type="number"] {
+    background: transparent;
+    border: none; outline: none;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 32px;
+    font-weight: 400;
+    width: 100%;
+    letter-spacing: -0.02em;
+  }
+  input[type="number"]::-webkit-inner-spin-button { display: none; }
+  .input-hint { font-family: var(--mono); font-size: 14px; color: var(--text3); margin-top: 6px; }
+  .year-display {
+    font-family: var(--display);
+    font-size: 56px;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .year-display span { color: var(--red); }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%; height: 2px;
+    background: var(--border2);
+    border-radius: 0;
+    cursor: pointer;
+    border: none; outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    background: var(--red);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    background: var(--red);
+    border: none; border-radius: 50%;
+  }
+
+  /* BUTTON */
+  .calc-btn {
+    width: 100%;
+    padding: 20px;
+    background: transparent;
+    border: 1px solid var(--red-dim);
+    color: var(--red);
+    font-family: var(--display);
+    font-size: 18px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 4px 4px;
+  }
+  .calc-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .calc-btn:hover { color: var(--text); border-color: var(--red); }
+  .calc-btn:hover::before { transform: scaleX(1); }
+  .calc-btn span { position: relative; z-index: 1; }
+
+  /* RESULT */
+  #result-section {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+  }
+  #result-section.visible { display: block; opacity: 1; transform: translateY(0); }
+
+  .result-verdict {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    padding: 28px 32px;
+    margin-bottom: 2px;
+    border-radius: 4px 4px 0 0;
+  }
+  .verdict-label {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .verdict-text {
+    font-size: 20px;
+    font-weight: 100;
+    color: var(--text2);
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+  }
+  .verdict-text strong { font-weight: 700; color: var(--text); }
+
+  .result-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .stat-value {
+    font-family: var(--display);
+    font-size: clamp(28px, 4vw, 38px);
+    letter-spacing: 0.04em;
+    color: var(--text);
+    line-height: 1;
+    display: block;
+  }
+  .stat-value.gain {
+    color: var(--red);
+    font-size: clamp(36px, 5.5vw, 52px);
+  }
+  .stat-unit { font-family: var(--mono); font-size: 13px; color: var(--text3); margin-top: 4px; display: block; }
+
+  /* WHAT IF */
+  .result-what-if {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    margin-bottom: 2px;
+  }
+  .what-if-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .what-if-items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .what-if-item { border-left: 1px solid var(--border); padding-left: 14px; }
+  .what-if-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+  .what-if-name { font-size: 15px; font-weight: 400; color: var(--text2); margin-bottom: 4px; }
+  .what-if-count { font-family: var(--mono); font-size: 22px; color: var(--text); font-weight: 500; }
+
+  /* SHARE */
+  .share-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 32px;
+    margin-bottom: 2px;
+    border-radius: 0 0 4px 4px;
+  }
+  .share-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .share-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .share-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .share-btn:hover { border-color: var(--border2); color: var(--text); background: var(--surface); }
+  .share-btn.kakao:hover { border-color: #f9e000; color: #f9e000; }
+  .share-btn.copy:hover  { border-color: var(--red-dim); color: var(--red); }
+  .share-btn.twitter:hover { border-color: #1d9bf0; color: #1d9bf0; }
+  .copy-toast {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--red);
+    margin-left: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .copy-toast.show { opacity: 1; }
+
+  /* CHART */
+  .chart-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    margin-top: 2px;
+    border-radius: 4px;
+    display: none;
+  }
+  .chart-section.visible { display: block; }
+  .chart-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    height: 130px;
+    gap: 5px;
+  }
+  .chart-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    gap: 4px;
+    cursor: pointer;
+    position: relative;
+  }
+  .chart-bar {
+    width: 100%;
+    background: var(--border2);
+    border-radius: 2px 2px 0 0;
+    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .chart-bar::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, var(--red) 0%, rgba(192,57,43,0.4) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .chart-col:hover .chart-bar::after { opacity: 0.5; }
+  .chart-bar.selected-year::after { opacity: 1; }
+  .chart-year {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    transform: rotate(-45deg);
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+  .chart-col:hover .chart-year { color: var(--text2); }
+  .chart-tooltip {
+    position: absolute;
+    top: -44px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    padding: 5px 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 10;
+    border-radius: 2px;
+  }
+  .chart-col:hover .chart-tooltip { opacity: 1; }
+
+  /* NAVER MAP */
+  .map-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 32px;
+    margin-top: 2px;
+    border-radius: 4px;
+    display: none;
+  }
+  .map-section.visible { display: block; }
+  .map-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .map-link:hover { border-color: #03c75a; color: #03c75a; }
+  .map-link-icon { font-size: 18px; }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 32px 24px 48px;
+    border-top: 1px solid var(--border);
+  }
+  footer p {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    line-height: 2;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    header { padding: 48px 0 32px; }
+    .site-title { font-size: 72px; }
+    .site-sub { font-size: 14px; }
+    main { padding: 0 14px 60px; }
+    .input-row { grid-template-columns: 1fr; }
+    .input-group:first-child { border-radius: 4px 4px 0 0; }
+    .input-group:last-child  { border-radius: 0 0 4px 4px; }
+    .result-stats { grid-template-columns: 1fr 1fr; }
+    .result-stats .stat-box:last-child { grid-column: 1 / -1; }
+    .what-if-items { grid-template-columns: 1fr; gap: 12px; }
+    .apt-grid { grid-template-columns: repeat(2, 1fr); }
+    .region-tab { padding: 9px 12px; font-size: 12px; }
+    .result-verdict { padding: 20px 20px; }
+    .result-what-if, .share-section { padding: 20px 20px; }
+    .chart-section { padding: 20px 16px; }
+    .share-btns { gap: 6px; }
+    .share-btn { padding: 10px 14px; font-size: 12px; }
+    .stat-box { padding: 18px 12px; }
+    .verdict-text { font-size: 16px; }
+    .step-label { font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="site-eyebrow">Seoul Real Estate · Regret Calculator</p>
+  <h1 class="site-title">내집이<span>었다면</span></h1>
+  <p class="site-sub">그때 샀으면 인생이 달라졌을 텐데</p>
+  <div class="divider-line"></div>
+</header>
+
+<main>
+
+  <div class="step-label">01 — 어디를 살 뻔 했나</div>
+
+  <div style="margin-bottom:32px">
+    <div class="region-tabs" id="regionTabs"></div>
+    <div class="apt-grid" id="aptGrid"></div>
+    <div class="selected-preview" id="selectedPreview">
+      <div class="preview-dot"></div>
+      <span class="preview-name" id="previewName">—</span>
+      <span class="preview-addr" id="previewAddr">—</span>
+      <span class="preview-area" id="previewArea">—</span>
+    </div>
+  </div>
+
+  <div class="step-label">02 — 얼마를, 언제</div>
+  <div class="input-row">
+    <div class="input-group">
+      <label class="input-label">투자 금액 (만원)</label>
+      <input type="number" id="investInput" placeholder="10000" min="1000" step="500">
+      <p class="input-hint" id="investHint">— 억</p>
+    </div>
+    <div class="input-group">
+      <label class="input-label">그때, 언제</label>
+      <div class="year-display"><span id="yearDisplay">2015</span>년</div>
+      <input type="range" id="yearSlider" min="2010" max="2024" value="2015" step="1">
+    </div>
+  </div>
+  <button class="calc-btn" onclick="calculate()">
+    <span>후회 계산하기</span>
+  </button>
+
+  <!-- RESULT -->
+  <div id="result-section" style="margin-top:32px">
+    <div class="step-label">03 — 후회의 크기</div>
+
+    <div class="result-verdict">
+      <div class="verdict-label">verdict</div>
+      <p class="verdict-text" id="verdictText">—</p>
+    </div>
+
+    <div class="result-stats">
+      <div class="stat-box">
+        <span class="stat-label">그때 시세</span>
+        <span class="stat-value" id="statThen">—</span>
+        <span class="stat-unit">만원</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">지금 시세 (2025)</span>
+        <span class="stat-value" id="statNow">—</span>
+        <span class="stat-unit">만원</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">못 번 돈</span>
+        <span class="stat-value gain" id="statGain">—</span>
+        <span class="stat-unit">만원</span>
+      </div>
+    </div>
+
+    <div class="result-what-if">
+      <div class="what-if-title">그 돈으로 뭘 살 수 있었나</div>
+      <div class="what-if-items" id="whatIfItems"></div>
+    </div>
+
+    <div class="share-section">
+      <div class="share-title">이 후회를 공유하기</div>
+      <div class="share-btns">
+        <button class="share-btn kakao" onclick="shareKakao()">💬 카카오톡</button>
+        <button class="share-btn twitter" onclick="shareTwitter()">𝕏 트위터</button>
+        <button class="share-btn copy" onclick="copyLink()">🔗 링크 복사</button>
+        <span class="copy-toast" id="copyToast">복사됨</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-section" id="chartSection" style="margin-top:2px">
+    <div class="chart-title">연도별 시세 흐름</div>
+    <div class="chart-bars" id="chartBars"></div>
+  </div>
+
+  <!-- NAVER MAP -->
+  <div class="map-section" id="mapSection">
+    <div class="map-title">단지 위치 확인</div>
+    <a class="map-link" id="mapLink" href="#" target="_blank">
+      <span class="map-link-icon">📍</span>
+      <span id="mapLinkText">네이버 지도에서 보기</span>
+    </a>
+  </div>
+
+</main>
+
+<footer>
+  <p>본 서비스는 참고용이며, 투자를 권유하지 않습니다</p>
+  <p>시세 데이터는 추정치이며 실제와 다를 수 있습니다 · 내집이었다면 © 2025</p>
+</footer>
+
+<script>
+const APARTMENTS = [
+  {id:"daechi_은마",name:"은마아파트",district:"강남구",region:"강남3구",address:"강남구 대치동",area:"27평 (84㎡)",prices:{2010:75000,2015:100000,2018:150000,2020:180000,2021:220000,2022:200000,2023:185000,2024:215000,2025:228000}},
+  {id:"daechi_래미안",name:"래미안대치팰리스",district:"강남구",region:"강남3구",address:"강남구 대치동",area:"25평 (84㎡)",prices:{2015:145000,2018:210000,2020:265000,2021:330000,2022:290000,2023:280000,2024:320000,2025:338000}},
+  {id:"apgujeong_현대",name:"압구정현대",district:"강남구",region:"강남3구",address:"강남구 압구정동",area:"26평 (84㎡)",prices:{2010:110000,2015:138000,2018:195000,2020:255000,2021:350000,2022:310000,2023:320000,2024:390000,2025:420000}},
+  {id:"dogok_타워팰리스",name:"타워팰리스",district:"강남구",region:"강남3구",address:"강남구 도곡동",area:"26평 (86㎡)",prices:{2010:95000,2015:118000,2018:158000,2020:205000,2021:255000,2022:220000,2023:215000,2024:245000,2025:258000}},
+  {id:"cheongdam_자이",name:"청담자이",district:"강남구",region:"강남3구",address:"강남구 청담동",area:"25평 (84㎡)",prices:{2015:125000,2018:170000,2020:225000,2021:285000,2022:248000,2023:242000,2024:275000,2025:290000}},
+  {id:"banpo_래미안퍼스티지",name:"래미안퍼스티지",district:"서초구",region:"강남3구",address:"서초구 반포동",area:"25평 (84㎡)",prices:{2010:100000,2015:138000,2018:205000,2020:268000,2021:355000,2022:315000,2023:328000,2024:375000,2025:395000}},
+  {id:"banpo_아크로",name:"아크로리버파크",district:"서초구",region:"강남3구",address:"서초구 반포동",area:"25평 (84㎡)",prices:{2016:175000,2018:240000,2020:305000,2021:400000,2022:352000,2023:362000,2024:420000,2025:445000}},
+  {id:"seocho_리더스원",name:"래미안리더스원",district:"서초구",region:"강남3구",address:"서초구 서초동",area:"25평 (84㎡)",prices:{2019:210000,2020:248000,2021:320000,2022:282000,2023:275000,2024:315000,2025:332000}},
+  {id:"banpo_자이",name:"반포자이",district:"서초구",region:"강남3구",address:"서초구 반포동",area:"25평 (84㎡)",prices:{2010:92000,2015:128000,2018:185000,2020:248000,2021:325000,2022:285000,2023:295000,2024:350000,2025:368000}},
+  {id:"seocho_힐스테이트",name:"힐스테이트서리풀",district:"서초구",region:"강남3구",address:"서초구 방배동",area:"25평 (84㎡)",prices:{2018:138000,2020:182000,2021:238000,2022:208000,2023:202000,2024:228000,2025:240000}},
+  {id:"jamsil_엘스",name:"잠실엘스",district:"송파구",region:"강남3구",address:"송파구 잠실동",area:"25평 (84㎡)",prices:{2010:80000,2015:108000,2018:155000,2020:200000,2021:255000,2022:228000,2023:222000,2024:255000,2025:268000}},
+  {id:"jamsil_리센츠",name:"잠실리센츠",district:"송파구",region:"강남3구",address:"송파구 잠실동",area:"25평 (84㎡)",prices:{2010:77000,2015:104000,2018:150000,2020:195000,2021:248000,2022:218000,2023:215000,2024:248000,2025:260000}},
+  {id:"jamsil_파크리오",name:"잠실파크리오",district:"송파구",region:"강남3구",address:"송파구 신천동",area:"24평 (80㎡)",prices:{2010:62000,2015:84000,2018:120000,2020:158000,2021:198000,2022:175000,2023:170000,2024:195000,2025:205000}},
+  {id:"songpa_헬리오",name:"헬리오시티",district:"송파구",region:"강남3구",address:"송파구 가락동",area:"25평 (84㎡)",prices:{2019:118000,2020:148000,2021:195000,2022:168000,2023:165000,2024:188000,2025:198000}},
+  {id:"songpa_포레온",name:"올림픽파크포레온",district:"송파구",region:"강남3구",address:"송파구 둔촌동",area:"25평 (84㎡)",prices:{2023:160000,2024:198000,2025:210000}},
+  {id:"mapo_리버웰",name:"래미안마포리버웰",district:"마포구",region:"마포/용산/성동",address:"마포구 대흥동",area:"25평 (84㎡)",prices:{2015:58000,2018:82000,2020:108000,2021:140000,2022:120000,2023:116000,2024:132000,2025:140000}},
+  {id:"mapo_더클래시",name:"마포더클래시",district:"마포구",region:"마포/용산/성동",address:"마포구 아현동",area:"25평 (84㎡)",prices:{2021:148000,2022:128000,2023:125000,2024:145000,2025:153000}},
+  {id:"mapo_공덕자이",name:"공덕자이",district:"마포구",region:"마포/용산/성동",address:"마포구 공덕동",area:"25평 (84㎡)",prices:{2015:54000,2018:76000,2020:102000,2021:130000,2022:112000,2023:108000,2024:125000,2025:132000}},
+  {id:"mapo_푸르지오",name:"마포래미안푸르지오",district:"마포구",region:"마포/용산/성동",address:"마포구 아현동",area:"25평 (84㎡)",prices:{2015:50000,2018:72000,2020:102000,2021:132000,2022:114000,2023:110000,2024:128000,2025:135000}},
+  {id:"mapo_아이파크",name:"신촌숲아이파크",district:"마포구",region:"마포/용산/성동",address:"마포구 대흥동",area:"25평 (84㎡)",prices:{2018:78000,2020:105000,2021:136000,2022:118000,2023:114000,2024:132000,2025:140000}},
+  {id:"yongsan_파크타워",name:"용산파크타워",district:"용산구",region:"마포/용산/성동",address:"용산구 한강로",area:"26평 (86㎡)",prices:{2015:90000,2018:125000,2020:170000,2021:225000,2022:192000,2023:188000,2024:218000,2025:230000}},
+  {id:"yongsan_더센트럴",name:"래미안용산더센트럴",district:"용산구",region:"마포/용산/성동",address:"용산구 용산동",area:"25평 (84㎡)",prices:{2020:180000,2021:238000,2022:205000,2023:200000,2024:232000,2025:245000}},
+  {id:"hannam_나인원",name:"나인원한남",district:"용산구",region:"마포/용산/성동",address:"용산구 한남동",area:"27평 (89㎡)",prices:{2019:280000,2020:330000,2021:450000,2022:390000,2023:410000,2024:480000,2025:510000}},
+  {id:"seongsu_트리마제",name:"트리마제",district:"성동구",region:"마포/용산/성동",address:"성동구 성수동",area:"25평 (84㎡)",prices:{2018:118000,2020:172000,2021:235000,2022:200000,2023:205000,2024:248000,2025:265000}},
+  {id:"oksu_파크힐스",name:"옥수파크힐스",district:"성동구",region:"마포/용산/성동",address:"성동구 옥수동",area:"25평 (82㎡)",prices:{2015:58000,2018:85000,2020:120000,2021:158000,2022:135000,2023:132000,2024:152000,2025:160000}},
+  {id:"haengdang_센트라스",name:"왕십리센트라스",district:"성동구",region:"마포/용산/성동",address:"성동구 행당동",area:"25평 (84㎡)",prices:{2015:50000,2018:70000,2020:97000,2021:125000,2022:108000,2023:105000,2024:120000,2025:127000}},
+  {id:"nowon_상계주공",name:"상계주공3단지",district:"노원구",region:"노원/중랑/강북",address:"노원구 상계동",area:"25평 (재건축)",prices:{2010:18000,2015:22000,2018:32000,2020:44000,2021:58000,2022:48000,2023:44000,2024:50000,2025:53000}},
+  {id:"nowon_롯데캐슬",name:"노원롯데캐슬",district:"노원구",region:"노원/중랑/강북",address:"노원구 월계동",area:"25평 (84㎡)",prices:{2015:28000,2018:38000,2020:52000,2021:66000,2022:56000,2023:53000,2024:58000,2025:61000}},
+  {id:"nowon_중계그린",name:"중계그린아파트",district:"노원구",region:"노원/중랑/강북",address:"노원구 중계동",area:"24평 (79㎡)",prices:{2010:22000,2015:28000,2018:40000,2020:55000,2021:70000,2022:59000,2023:54000,2024:60000,2025:63000}},
+  {id:"nowon_하계현대",name:"하계현대아파트",district:"노원구",region:"노원/중랑/강북",address:"노원구 하계동",area:"25평 (82㎡)",prices:{2010:20000,2015:25000,2018:35000,2020:48000,2021:62000,2022:52000,2023:48000,2024:53000,2025:56000}},
+  {id:"nowon_태릉해링턴",name:"태릉해링턴플레이스",district:"노원구",region:"노원/중랑/강북",address:"노원구 공릉동",area:"25평 (84㎡)",prices:{2018:36000,2020:50000,2021:64000,2022:54000,2023:51000,2024:57000,2025:60000}},
+  {id:"nowon_상계래미안",name:"상계래미안",district:"노원구",region:"노원/중랑/강북",address:"노원구 상계동",area:"25평 (84㎡)",prices:{2015:27000,2018:38000,2020:53000,2021:68000,2022:57000,2023:53000,2024:59000,2025:62000}},
+  {id:"nowon_중계무지개",name:"중계무지개아파트",district:"노원구",region:"노원/중랑/강북",address:"노원구 중계동",area:"24평 (79㎡)",prices:{2010:19000,2015:24000,2018:33000,2020:46000,2021:59000,2022:49000,2023:45000,2024:50000,2025:53000}},
+  {id:"jungnang_신내데시앙",name:"신내데시앙포레",district:"중랑구",region:"노원/중랑/강북",address:"중랑구 신내동",area:"25평 (84㎡)",prices:{2018:32000,2020:46000,2021:58000,2022:48000,2023:45000,2024:50000,2025:53000}},
+  {id:"jungnang_면목한양",name:"면목한양아파트",district:"중랑구",region:"노원/중랑/강북",address:"중랑구 면목동",area:"24평 (79㎡)",prices:{2010:14000,2015:18000,2018:26000,2020:37000,2021:48000,2022:40000,2023:37000,2024:41000,2025:43000}},
+  {id:"jungnang_묵동현대",name:"묵동현대아파트",district:"중랑구",region:"노원/중랑/강북",address:"중랑구 묵동",area:"25평 (82㎡)",prices:{2010:16000,2015:21000,2018:30000,2020:43000,2021:55000,2022:46000,2023:42000,2024:47000,2025:49000}},
+  {id:"jungnang_롯데캐슬",name:"중랑역롯데캐슬",district:"중랑구",region:"노원/중랑/강북",address:"중랑구 상봉동",area:"25평 (84㎡)",prices:{2018:36000,2020:51000,2021:63000,2022:53000,2023:50000,2024:56000,2025:59000}},
+  {id:"jungnang_상봉프레미어스",name:"상봉프레미어스엠코",district:"중랑구",region:"노원/중랑/강북",address:"중랑구 상봉동",area:"25평 (84㎡)",prices:{2015:27000,2018:38000,2020:52000,2021:66000,2022:55000,2023:52000,2024:58000,2025:61000}},
+  {id:"jungnang_신내2지구",name:"신내2지구아이파크",district:"중랑구",region:"노원/중랑/강북",address:"중랑구 신내동",area:"25평 (84㎡)",prices:{2018:34000,2020:49000,2021:61000,2022:51000,2023:48000,2024:54000,2025:57000}},
+  {id:"jungnang_망우주공",name:"망우주공아파트",district:"중랑구",region:"노원/중랑/강북",address:"중랑구 망우동",area:"24평 (79㎡)",prices:{2010:13000,2015:17000,2018:24000,2020:34000,2021:44000,2022:37000,2023:34000,2024:38000,2025:40000}},
+  {id:"gangbuk_미아래미안",name:"미아래미안엠디움",district:"강북구",region:"노원/중랑/강북",address:"강북구 미아동",area:"25평 (84㎡)",prices:{2015:25000,2018:35000,2020:49000,2021:62000,2022:52000,2023:49000,2024:54000,2025:57000}},
+  {id:"gangdong_고덕래미안",name:"고덕래미안힐스테이트",district:"강동구",region:"강동/광진",address:"강동구 고덕동",area:"25평 (84㎡)",prices:{2018:78000,2020:108000,2021:140000,2022:118000,2023:115000,2024:132000,2025:140000}},
+  {id:"gangdong_현대",name:"강동현대아파트",district:"강동구",region:"강동/광진",address:"강동구 둔촌동",area:"25평 (82㎡)",prices:{2010:38000,2015:48000,2018:65000,2020:88000,2021:112000,2022:95000,2023:92000,2024:105000,2025:112000}},
+  {id:"gwangjin_스타시티",name:"자양더샵스타시티",district:"광진구",region:"강동/광진",address:"광진구 자양동",area:"25평 (84㎡)",prices:{2015:58000,2018:82000,2020:112000,2021:144000,2022:122000,2023:120000,2024:138000,2025:145000}},
+  {id:"dongjak_흑석",name:"흑석아크로리버하임",district:"동작구",region:"동작/영등포/양천",address:"동작구 흑석동",area:"25평 (84㎡)",prices:{2020:128000,2021:172000,2022:148000,2023:145000,2024:168000,2025:178000}},
+  {id:"dongjak_상도롯데",name:"상도롯데캐슬",district:"동작구",region:"동작/영등포/양천",address:"동작구 상도동",area:"25평 (84㎡)",prices:{2015:42000,2018:60000,2020:82000,2021:108000,2022:90000,2023:87000,2024:100000,2025:106000}},
+  {id:"yeongdeungpo_당산",name:"당산센트럴아이파크",district:"영등포구",region:"동작/영등포/양천",address:"영등포구 당산동",area:"25평 (84㎡)",prices:{2018:72000,2020:102000,2021:134000,2022:112000,2023:108000,2024:125000,2025:132000}},
+  {id:"yeongdeungpo_여의도자이",name:"여의도자이",district:"영등포구",region:"동작/영등포/양천",address:"영등포구 여의도동",area:"25평 (84㎡)",prices:{2015:80000,2018:110000,2020:148000,2021:195000,2022:168000,2023:165000,2024:190000,2025:200000}},
+  {id:"yangcheon_목동7단지",name:"목동신시가지7단지",district:"양천구",region:"동작/영등포/양천",address:"양천구 목동",area:"25평 (82㎡)",prices:{2010:62000,2015:80000,2018:108000,2020:145000,2021:188000,2022:162000,2023:158000,2024:182000,2025:192000}},
+  {id:"yangcheon_파라곤",name:"신목동파라곤",district:"양천구",region:"동작/영등포/양천",address:"양천구 신정동",area:"25평 (84㎡)",prices:{2015:45000,2018:62000,2020:84000,2021:108000,2022:90000,2023:87000,2024:100000,2025:106000}},
+];
+
+const REGIONS = ["강남3구","마포/용산/성동","노원/중랑/강북","강동/광진","동작/영등포/양천"];
+
+const WHATIF = [
+  {icon:"🚗",name:"제네시스 G80",price:6500},
+  {icon:"✈️",name:"유럽 여행 (2주)",price:400},
+  {icon:"💎",name:"까르띠에 반지",price:450},
+  {icon:"🍣",name:"오마카세",price:30},
+  {icon:"🥃",name:"맥캘란 18년",price:35},
+  {icon:"👟",name:"에어조던 1 OG",price:30},
+  {icon:"📱",name:"아이폰 16 Pro",price:165},
+  {icon:"🛋️",name:"에르메스 소파",price:5000},
+  {icon:"🏋️",name:"PT 100회",price:300},
+  {icon:"🎸",name:"펜더 커스텀샵 기타",price:450},
+  {icon:"🍷",name:"로마네 꽁티 1병",price:2500},
+  {icon:"⌚",name:"롤렉스 서브마리너",price:1500},
+];
+
+let selectedApt = null;
+let selectedRegion = REGIONS[0];
+let lastResult = null;
+
+function init() {
+  renderRegionTabs();
+  renderAptGrid();
+  document.getElementById('yearSlider').addEventListener('input', function() {
+    document.getElementById('yearDisplay').textContent = this.value;
+  });
+  document.getElementById('investInput').addEventListener('input', function() {
+    const v = parseInt(this.value) || 0;
+    document.getElementById('investHint').textContent = v >= 10000
+      ? (v/10000).toFixed(1) + ' 억'
+      : v.toLocaleString() + ' 만원';
+  });
+}
+
+function renderRegionTabs() {
+  document.getElementById('regionTabs').innerHTML = REGIONS.map(r => `
+    <button class="region-tab ${r===selectedRegion?'active':''}" onclick="selectRegion('${r}')">${r}</button>
+  `).join('');
+}
+
+function renderAptGrid() {
+  const apts = APARTMENTS.filter(a => a.region === selectedRegion);
+  document.getElementById('aptGrid').innerHTML = apts.map(a => `
+    <div class="apt-item ${selectedApt?.id===a.id?'selected':''}" onclick="selectApt('${a.id}')">
+      <div class="apt-name">${a.name}</div>
+      <div class="apt-meta">
+        <span class="apt-district">${a.district}</span>
+        <span class="apt-area-badge">${a.area}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectRegion(r) {
+  selectedRegion = r;
+  renderRegionTabs();
+  renderAptGrid();
+}
+
+function selectApt(id) {
+  selectedApt = APARTMENTS.find(a => a.id === id);
+  renderAptGrid();
+  const preview = document.getElementById('selectedPreview');
+  preview.classList.add('show');
+  document.getElementById('previewName').textContent = selectedApt.name;
+  document.getElementById('previewAddr').textContent = selectedApt.address;
+  document.getElementById('previewArea').textContent = selectedApt.area;
+
+  const years = Object.keys(selectedApt.prices).map(Number).sort();
+  const slider = document.getElementById('yearSlider');
+  slider.min = years[0];
+  slider.max = years[years.length - 2];
+  const cur = parseInt(slider.value);
+  if (cur < years[0]) { slider.value = years[0]; document.getElementById('yearDisplay').textContent = years[0]; }
+  if (cur > years[years.length-2]) { slider.value = years[years.length-2]; document.getElementById('yearDisplay').textContent = years[years.length-2]; }
+}
+
+function getVerdicts(apt, year, invest, gain, gainRate, units, currentValue) {
+  const gainAeok = (gain/10000).toFixed(1);
+  const investAeok = (invest/10000).toFixed(1);
+  const nowAeok = (currentValue/10000).toFixed(1);
+  const pool = [
+    `<strong>${year}년</strong>에 <strong>${invest.toLocaleString()}만원</strong>을 ${apt.name}에 넣었다면, 지금쯤 <strong>${gainAeok}억</strong>이 더 있었다. 그 돈으로 뭘 했는지는 묻지 않겠다.`,
+    `${year}년의 당신은 ${apt.name}을 <strong>${(units*100).toFixed(2)}%</strong> 살 수 있었다. 지금 그 지분의 가치는 <strong>${nowAeok}억</strong>이다. 잘 잤나.`,
+    `시세 상승률 <strong>+${gainRate}%</strong>. ${invest.toLocaleString()}만원이 ${currentValue.toLocaleString()}만원이 됐다. 당신 인생에서 가장 비싼 망설임이었다.`,
+    `<strong>${gainAeok}억</strong>. 그게 ${year}년 당신의 결정이 만들어낸 공백이다. 다음 생에는 좀 더 용감해지길.`,
+    `${apt.name}, ${year}년. 당시 <strong>${investAeok}억</strong>이면 충분했다. 지금은 <strong>${nowAeok}억</strong>이 필요하다. 이게 인생이다.`,
+    `매달 월급을 모아도 따라잡을 수 없는 <strong>${gainAeok}억</strong>의 차이. ${year}년의 당신이 무슨 생각을 했는지 지금도 이해가 안 된다.`,
+    `부동산은 타이밍이라고 했다. <strong>${year}년</strong>이 그 타이밍이었다. 당신은 그 자리에 없었다.`,
+    `<strong>${gainRate}%</strong> 올랐다. 같은 기간 당신 통장은 몇 % 올랐나.`,
+  ];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function calculate() {
+  if (!selectedApt) { alert('아파트를 먼저 선택해주세요'); return; }
+  const invest = parseInt(document.getElementById('investInput').value);
+  if (!invest || invest < 100) { alert('투자 금액을 입력해주세요'); return; }
+  const year = parseInt(document.getElementById('yearSlider').value);
+  const priceThen = selectedApt.prices[year];
+  const priceNow  = selectedApt.prices[2025];
+  if (!priceThen) { alert(`${year}년 시세 데이터가 없습니다`); return; }
+
+  const units = invest / priceThen;
+  const currentValue = units * priceNow;
+  const gain = currentValue - invest;
+  const gainRate = ((priceNow - priceThen) / priceThen * 100).toFixed(1);
+
+  lastResult = { apt: selectedApt.name, year, invest, gain: Math.round(gain), gainRate, currentValue: Math.round(currentValue) };
+
+  const section = document.getElementById('result-section');
+  section.style.display = 'block';
+  requestAnimationFrame(() => section.classList.add('visible'));
+
+  document.getElementById('verdictText').innerHTML = getVerdicts(selectedApt, year, invest, gain, gainRate, units, currentValue);
+
+  animateNumber('statThen', priceThen);
+  animateNumber('statNow', priceNow);
+  animateNumber('statGain', Math.round(gain));
+
+  const shuffled = [...WHATIF].sort(() => Math.random()-0.5).slice(0, 3);
+  document.getElementById('whatIfItems').innerHTML = shuffled.map(w => {
+    const count = Math.floor(gain / w.price);
+    return `<div class="what-if-item">
+      <span class="what-if-icon">${w.icon}</span>
+      <div class="what-if-name">${w.name}</div>
+      <div class="what-if-count">${count > 0 ? count.toLocaleString()+'개' : '—'}</div>
+    </div>`;
+  }).join('');
+
+  renderChart(selectedApt, year);
+  renderMapLink(selectedApt);
+
+  setTimeout(() => section.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+}
+
+function animateNumber(elId, target) {
+  const el = document.getElementById(elId);
+  const duration = 1200;
+  const start = performance.now();
+  function update(now) {
+    const p = Math.min((now-start)/duration, 1);
+    const e = 1 - Math.pow(1-p, 3);
+    el.textContent = Math.round(target * e).toLocaleString();
+    if (p < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+function renderChart(apt, selectedYear) {
+  const section = document.getElementById('chartSection');
+  section.classList.add('visible');
+  const entries = Object.entries(apt.prices).sort((a,b) => a[0]-b[0]);
+  const maxPrice = Math.max(...entries.map(e => e[1]));
+  document.getElementById('chartBars').innerHTML = entries.map(([yr, price]) => {
+    const h = Math.round((price/maxPrice)*120);
+    const isSel = parseInt(yr) === selectedYear;
+    return `<div class="chart-col">
+      <div class="chart-tooltip">${yr}년<br>${price.toLocaleString()}만</div>
+      <div class="chart-bar ${isSel?'selected-year':''}" style="height:${h}px"></div>
+      <div class="chart-year">${yr}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMapLink(apt) {
+  const section = document.getElementById('mapSection');
+  section.classList.add('visible');
+  const query = encodeURIComponent(apt.name + ' ' + apt.address);
+  document.getElementById('mapLink').href = `https://map.naver.com/v5/search/${query}`;
+  document.getElementById('mapLinkText').textContent = `${apt.name} 네이버 지도에서 보기`;
+}
+
+/* ── SHARE ── */
+function getShareText() {
+  if (!lastResult) return '내집이었다면 — 서울 부동산 후회 계산기';
+  const g = (lastResult.gain/10000).toFixed(1);
+  return `${lastResult.year}년에 ${lastResult.apt} 샀으면 지금쯤 ${g}억이 더 있었다 😭 #내집이었다면 #부동산후회`;
+}
+
+function shareKakao() {
+  const text = getShareText();
+  const url = window.location.href;
+  // 카카오 SDK 없이 클립보드 + 안내
+  navigator.clipboard.writeText(text + '\n' + url).then(() => {
+    alert('카카오톡에 붙여넣기 할 수 있도록 클립보드에 복사됐어요!\n\n' + text);
+  });
+}
+
+function shareTwitter() {
+  const text = encodeURIComponent(getShareText());
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+}
+
+function copyLink() {
+  const text = getShareText() + '\n' + window.location.href;
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById('copyToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
